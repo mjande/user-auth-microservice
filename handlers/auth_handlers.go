@@ -16,16 +16,16 @@ func RegisterUser(w http.ResponseWriter, r *http.Request) {
 
 	hashedPassword, err := utils.HashPassword(user.Password)
 	if err != nil {
-		http.Error(w, "Error while hashing password", http.StatusInternalServerError)
 		log.Println(err)
+		utils.SendErrorResponse(w, http.StatusInternalServerError, "Error while hashing password")
 		return
 	}
 
-	query := "INSERT INTO users VALUES (?, ?)"
+	query := "INSERT INTO users (email, password) VALUES ($1, $2);"
 	_, err = database.DB.Exec(r.Context(), query, user.Email, hashedPassword)
 	if err != nil {
-		http.Error(w, "Error inserting user", http.StatusInternalServerError)
 		log.Println(err)
+		utils.SendErrorResponse(w, http.StatusInternalServerError, "Error inserting user")
 		return
 	}
 
@@ -49,19 +49,21 @@ func LoginUser(w http.ResponseWriter, r *http.Request) {
 	row.Scan(&id, &hashedPassword)
 
 	if !utils.CheckPassword(user.Password, hashedPassword) {
-		http.Error(w, "Invalid email or password", http.StatusUnauthorized)
+		utils.SendErrorResponse(w, http.StatusUnauthorized, "Invalid email or password")
 		return
 	}
 
 	token, err := utils.GenerateJWT(id)
+	var data map[string]string
 	if err != nil {
-		http.Error(w, "Error generating token", http.StatusInternalServerError)
 		log.Println(err)
+		utils.SendErrorResponse(w, http.StatusInternalServerError, "Error generating token")
 		return
 	}
 
-	data := map[string]string{
-		"token": token,
+	data = map[string]string{
+		"token":   token,
+		"message": "Successfully logged in",
 	}
 
 	json.NewEncoder(w).Encode(data)

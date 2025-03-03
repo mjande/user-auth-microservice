@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/go-chi/chi"
+	"github.com/go-chi/cors"
 	"github.com/joho/godotenv"
 	"github.com/mjande/user-auth-microservice/database"
 	"github.com/mjande/user-auth-microservice/routes"
@@ -25,6 +26,12 @@ func main() {
 	defer database.DB.Close()
 
 	router := chi.NewRouter()
+
+	router.Use(cors.Handler(cors.Options{
+		AllowedOrigins: []string{os.Getenv("CLIENT_URL")},
+		AllowedMethods: []string{"POST"},
+	}))
+
 	routes.RegisterAuthRoutes(router)
 
 	log.Printf("Auth service listening on port %s", os.Getenv("PORT"))
