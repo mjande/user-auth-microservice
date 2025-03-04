@@ -15,6 +15,6 @@ func GenerateJWT(userId int) (string, error) {
 		"expires": time.Now().Add(time.Hour * 24).Unix(),
 	}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodES256, claims)
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString(secretKey)
 }
