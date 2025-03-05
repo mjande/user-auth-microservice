@@ -7,18 +7,13 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/cors"
-	"github.com/joho/godotenv"
+	_ "github.com/joho/godotenv/autoload"
 	"github.com/mjande/user-auth-microservice/database"
 	"github.com/mjande/user-auth-microservice/routes"
 )
 
 func main() {
-	err := godotenv.Load("config/.env")
-	if err != nil {
-		log.Fatal("Error loading environment variables")
-	}
-
-	err = database.InitDB()
+	err := database.InitDB()
 	if err != nil {
 		log.Fatal(err)
 		return
