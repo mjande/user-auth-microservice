@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
 	_ "github.com/joho/godotenv/autoload"
 	"github.com/mjande/user-auth-microservice/database"
@@ -26,6 +27,8 @@ func main() {
 		AllowedOrigins: []string{os.Getenv("CLIENT_URL")},
 		AllowedMethods: []string{"POST"},
 	}))
+
+	router.Use(middleware.Logger)
 
 	routes.RegisterAuthRoutes(router)
 
